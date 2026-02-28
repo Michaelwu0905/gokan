@@ -5,14 +5,20 @@ description = "Gokan Japanese Learning App Backend"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
+    "aliyun-python-sdk-core>=2.16.0",
+    "aliyun-python-sdk-nls-cloud-meta>=1.0.1",
     "fastapi>=0.134.0",
     "httpx>=0.28.1",
     "openai>=2.24.0",
     "pydantic>=2.12.5",
     "python-dotenv>=1.2.1",
+    "requests>=2.32.5",
     "sqlalchemy>=2.0.47",
     "uvicorn>=0.41.0",
 ]
 
 [project.scripts]
 gokan-server = "gokan_backend.main:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/gokan_backend"]

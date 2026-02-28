@@ -37,22 +37,35 @@ gokan/
 
 ### 1. 配置 API Keys（可选）
 
-如果你想使用真实的 AI API，需要配置 API Keys：
+#### 🇨🇳 中国用户推荐（国内网络友好）
 
 ```bash
 cd backend
 cp .env.example .env
-# 编辑 .env 填入你的 API Keys
+# 编辑 .env 填入以下配置
 ```
 
-支持的 API:
+**核心配置（无需翻墙）:**
 - **Moonshot Kimi** (AI对话): https://platform.moonshot.cn/
-- **OpenAI** (语音转文字): https://platform.openai.com/
-- **Azure TTS** (语音合成): https://azure.microsoft.com/
+- **阿里云 NLS** (语音服务): https://www.aliyun.com/product/nls
 
-如果不配置，系统会使用虚拟模式（模拟数据），适合开发和测试。
+阿里云语音服务优势:
+- ✅ 国内网络直连，速度快
+- ✅ 语音识别 + 语音合成一体化
+- ✅ 每月 **50 万次免费调用额度**
+- ✅ 支持日语语音合成
 
-详细配置说明见 [backend/README.md](backend/README.md)
+#### 🌍 国外用户
+
+- **Moonshot Kimi** (AI对话)
+- **OpenAI Whisper** (语音转文字)
+- **Azure TTS** (语音合成)
+
+#### ⚪ 虚拟模式
+
+如果不配置 API Keys，系统会使用虚拟模式（模拟数据），适合开发和测试。
+
+**详细配置说明见 [backend/README.md](backend/README.md)**
 
 ### 2. 启动后端服务
 

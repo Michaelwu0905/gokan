@@ -25,18 +25,27 @@ else
     echo "   ⚪ Moonshot Kimi: Not configured (using virtual mode)"
 fi
 
+# Check Aliyun Audio (recommended for China)
+if grep -q "^ALIYUN_ACCESS_KEY_ID=[a-zA-Z0-9]" .env 2>/dev/null && \
+   grep -q "^ALIYUN_ACCESS_KEY_SECRET=[a-zA-Z0-9]" .env 2>/dev/null && \
+   grep -q "^ALIYUN_APP_KEY=[a-zA-Z0-9]" .env 2>/dev/null; then
+    echo "   ✅ Aliyun Audio (Recommended for China): Configured"
+else
+    echo "   ⚪ Aliyun Audio: Not configured (using OpenAI/Azure or virtual mode)"
+fi
+
 # Check OpenAI API
 if grep -q "^OPENAI_API_KEY=sk-" .env 2>/dev/null; then
     echo "   ✅ OpenAI Whisper: Configured"
 else
-    echo "   ⚪ OpenAI Whisper: Not configured (using virtual mode)"
+    echo "   ⚪ OpenAI Whisper: Not configured"
 fi
 
 # Check Azure TTS
 if grep -q "^AZURE_TTS_KEY=[a-zA-Z0-9]" .env 2>/dev/null; then
     echo "   ✅ Azure TTS: Configured"
 else
-    echo "   ⚪ Azure TTS: Not configured (using virtual mode)"
+    echo "   ⚪ Azure TTS: Not configured"
 fi
 
 echo ""
