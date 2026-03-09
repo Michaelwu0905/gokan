@@ -1,119 +1,86 @@
-# 語感（Gokan）MVP
+# Japanese Learning Assistant
 
-AI驱动的日语口语练习App MVP版本。
+一个跨平台桌面端日语学习辅助工具，采用 Electron + FastAPI 双进程架构。
+
+## 功能特性
+
+- 🔥 全局快捷键唤醒截图
+- 📸 屏幕区域选择
+- 🤖 AI 驱动的日语文本识别、翻译和语法分析
+- 📝 平假名注音、语法拆解、例句展示
+- 🎨 现代化悬浮卡片 UI
 
 ## 技术栈
 
-- **后端**: FastAPI + SQLite + uv
-- **前端**: React + Vite + React Router
-
-## 项目结构
-
-```
-gokan/
-├── backend/                 # FastAPI 后端
-│   ├── src/gokan_backend/   # 后端源码
-│   │   ├── main.py         # FastAPI 主应用
-│   │   ├── database.py     # 数据库配置
-│   │   ├── models.py       # SQLAlchemy 模型
-│   │   ├── schemas.py      # Pydantic 模型
-│   │   └── ai_service.py   # 虚拟 AI 服务
-│   └── pyproject.toml      # uv 项目配置
-│
-└── frontend/               # React 前端
-    ├── src/
-    │   ├── pages/          # 页面组件
-    │   │   ├── Scenarios.jsx   # 场景选择
-    │   │   ├── Chat.jsx        # 对话界面
-    │   │   ├── Summary.jsx     # 练习总结
-    │   │   └── Stats.jsx       # 学习档案
-    │   ├── api.js          # API 客户端
-    │   ├── App.jsx         # 主应用
-    │   └── App.css         # 全局样式
-    └── package.json
-```
+- **前端**: Electron, Node.js, HTML/CSS/JS
+- **后端**: Python 3.10+, FastAPI, Uvicorn
+- **AI**: OpenAI Vision API (兼容格式)
+- **项目管理**: uv
 
 ## 快速开始
 
-### 1. 配置 API Keys（可选）
-
-#### 🇨🇳 中国用户推荐（国内网络友好）
+### 1. 克隆项目
 
 ```bash
-cd backend
+git clone <repository-url>
+cd japanese-learning-assistant
+```
+
+### 2. 安装 Python 依赖
+
+```bash
+# 安装 uv（如果还没有）
+pip install uv
+
+# 创建虚拟环境并安装依赖
+uv venv
+source .venv/bin/activate  # Linux/Mac
+# 或 .venv\Scripts\activate  # Windows
+
+uv pip install -e .
+```
+
+### 3. 配置环境变量
+
+```bash
 cp .env.example .env
-# 编辑 .env 填入以下配置
+# 编辑 .env 文件，设置你的 OpenAI API Key
 ```
 
-**核心配置（无需翻墙）:**
-- **Moonshot Kimi** (AI对话): https://platform.moonshot.cn/
-- **阿里云 NLS** (语音服务): https://www.aliyun.com/product/nls
+### 4. 启动后端服务（测试）
 
-阿里云语音服务优势:
-- ✅ 国内网络直连，速度快
-- ✅ 语音识别 + 语音合成一体化
-- ✅ 每月 **50 万次免费调用额度**
-- ✅ 支持日语语音合成
-
-#### 🌍 国外用户
-
-- **Moonshot Kimi** (AI对话)
-- **OpenAI Whisper** (语音转文字)
-- **Azure TTS** (语音合成)
-
-#### ⚪ 虚拟模式
-
-如果不配置 API Keys，系统会使用虚拟模式（模拟数据），适合开发和测试。
-
-**详细配置说明见 [backend/README.md](backend/README.md)**
-
-### 2. 启动后端服务
-
-**方式1: 使用启动脚本（推荐）**
 ```bash
-cd backend
-./start.sh
+python -m backend.main
 ```
 
-**方式2: 手动启动**
-```bash
-cd backend
-uv run uvicorn gokan_backend.main:app --host 0.0.0.0 --port 8000 --reload
-```
-
-后端将在 http://localhost:8000 运行  
-API 文档: http://localhost:8000/docs
-
-### 3. 启动前端服务
+### 5. 启动 Electron 应用
 
 ```bash
 cd frontend
-npm run dev
+npm install
+npm start
 ```
 
-前端将在 http://localhost:5173 运行
+## 开发
 
-## 核心功能
+### 项目结构
 
-✅ **10个预设场景**: 便利店、自我介绍、餐厅、问路、酒店、医院、银行、理发店、超市、邮局
-✅ **虚拟AI对话**: 基于规则的模拟回复
-✅ **智能纠错**: 助词错误检测（演示用）
-✅ **学习档案**: 练习统计和错误分析
-✅ **微信式聊天界面**: 简洁友好的UI
+```
+japanese-learning-assistant/
+├── backend/              # Python FastAPI 后端
+│   ├── __init__.py
+│   ├── main.py          # FastAPI 入口
+│   ├── models.py        # Pydantic 数据模型
+│   └── ai_service.py    # AI 服务
+├── frontend/            # Electron 前端
+│   ├── main.js         # 主进程
+│   ├── preload.js      # 预加载脚本
+│   ├── capture.html    # 截图窗口
+│   └── result.html     # 结果窗口
+├── pyproject.toml       # Python 项目配置
+└── .env.example        # 环境变量示例
+```
 
-## API 端点
+## 许可证
 
-- `GET /` - 欢迎信息
-- `GET /scenarios` - 获取所有场景
-- `POST /sessions` - 创建对话会话
-- `GET /sessions/{id}` - 获取会话详情
-- `POST /sessions/{id}/messages` - 发送消息
-- `GET /sessions/{id}/summary` - 获取练习总结
-- `GET /stats` - 获取学习统计
-
-## 设计特点
-
-- **温暖配色**: 紫色渐变，减少学习焦虑
-- **拟声词加载**: "ふむふむ"思考中
-- **核心词汇提示**: 每个场景提供3-5个关键词
-- **气泡式对话**: 类似微信的聊天体验
+MIT
