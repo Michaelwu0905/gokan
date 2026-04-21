@@ -229,8 +229,8 @@ function createResultWindow(croppedImageData, selectionBounds) {
   const display = screen.getDisplayNearestPoint({ x: selectionBounds.x, y: selectionBounds.y });
   const workArea = display.workArea;
   
-  const windowWidth = 450;
-  const windowHeight = 350;
+  const windowWidth = 520;
+  const windowHeight = 600;
   
   let x = selectionBounds.x;
   let y = selectionBounds.y + selectionBounds.height + 10;

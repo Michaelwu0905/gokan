@@ -4,7 +4,7 @@ const { contextBridge, ipcRenderer } = require('electron');
 contextBridge.exposeInMainWorld('electronAPI', {
   // 截图相关
   onScreenCaptured: (callback) => {
-    ipcRenderer.on('screen-captured', (event, imageData) => callback(imageData));
+    ipcRenderer.once('screen-captured', (event, imageData) => callback(imageData));
   },
   
   // 区域选择完成
@@ -14,7 +14,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
   
   // 结果展示相关
   onShowResult: (callback) => {
-    ipcRenderer.on('show-result', (event, imageData) => callback(imageData));
+    ipcRenderer.once('show-result', (event, imageData) => callback(imageData));
   },
   
   // 关闭结果窗口

@@ -117,18 +117,53 @@
       font-size: 20px;
       font-weight: 500;
       color: #fff;
-      margin-bottom: 4px;
+      margin-bottom: 8px;
+      line-height: 2;
     }
 
-    .furigana {
-      font-size: 12px;
+    ruby rt {
+      font-size: 10px;
       color: #aaa;
-      margin-bottom: 8px;
     }
 
     .translation {
       font-size: 14px;
       color: #ddd;
+    }
+
+    .vocab-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+    }
+
+    .vocab-item:last-child {
+      border-bottom: none;
+    }
+
+    .vocab-word {
+      font-size: 16px;
+      font-weight: 500;
+      color: #fff;
+      min-width: 60px;
+      line-height: 1.8;
+    }
+
+    .vocab-meaning {
+      font-size: 13px;
+      color: #bbb;
+      flex: 1;
+    }
+
+    .pos-badge {
+      font-size: 11px;
+      color: #888;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 4px;
+      padding: 1px 6px;
+      white-space: nowrap;
     }
 
     .grammar-item {
@@ -140,10 +175,16 @@
       border-bottom: none;
     }
 
+    .grammar-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 4px;
+    }
+
     .grammar-word {
       font-weight: 500;
       color: #00d4ff;
-      margin-bottom: 4px;
     }
 
     .grammar-explanation {
@@ -151,8 +192,17 @@
       color: #bbb;
     }
 
+    .example-item {
+      padding: 8px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+    }
+
+    .example-item:last-child {
+      border-bottom: none;
+    }
+
     .example-jp {
-      font-size: 16px;
+      font-size: 15px;
       color: #fff;
       margin-bottom: 4px;
     }
@@ -205,19 +255,22 @@
         <div class="result-section">
           <div class="section-title">原文</div>
           <div class="original-text" id="original-text"></div>
-          <div class="furigana" id="furigana"></div>
           <div class="translation" id="translation"></div>
         </div>
-        
+
+        <div class="result-section">
+          <div class="section-title">词汇</div>
+          <div id="vocab-list"></div>
+        </div>
+
         <div class="result-section">
           <div class="section-title">语法解析</div>
           <div id="grammar-list"></div>
         </div>
-        
+
         <div class="result-section">
           <div class="section-title">例句</div>
-          <div class="example-jp" id="example-jp"></div>
-          <div class="example-cn" id="example-cn"></div>
+          <div id="example-list"></div>
         </div>
       </div>
       

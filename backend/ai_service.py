@@ -5,48 +5,77 @@ from typing import Optional
 from openai import OpenAI
 from dotenv import load_dotenv
 
-from .models import AnalyzeData, GrammarPoint, ExampleSentence
+from .models import AnalyzeData, FuriganaToken, VocabItem, GrammarPoint, ExampleSentence
 
 load_dotenv()
 
-SYSTEM_PROMPT = """你是一个专业的日语教师。请分析图片中的日语文本，并按以下要求处理：
-
-1. 提取图片中的所有日语文本
-2. 提供精确的中文翻译
-3. 为原文中的汉字标注平假名读音
-4. 拆解核心语法点，解释词性和用法
-5. 提供一个包含核心语法或单词的例句及其中文翻译
-
-重要：请严格按照以下JSON格式输出，不要包含markdown代码块标记，不要添加任何额外说明：
+SYSTEM_PROMPT = """你是一个专业的日语教师。请分析图片中的日语文本，严格按以下JSON格式输出，不含markdown标记，不添加任何额外说明：
 
 {
     "original_text": "提取出的日文原文",
     "translation": "对应的中文翻译",
-    "furigana": "原文的平假名注音（仅针对汉字标注）",
-    "grammar_analysis": [
-        {"word": "单词或语法点1", "explanation": "词性与用法解释"},
-        {"word": "单词或语法点2", "explanation": "词性与用法解释"}
+    "furigana_tokens": [
+        {"text": "今日", "reading": "きょう"},
+        {"text": "は", "reading": ""},
+        {"text": "良", "reading": "よ"},
+        {"text": "い", "reading": ""},
+        {"text": "天気", "reading": "てんき"},
+        {"text": "です", "reading": ""},
+        {"text": "ね", "reading": ""}
     ],
-    "example_sentence": {
-        "japanese": "包含核心语法或单词的日文例句",
-        "chinese": "例句的中文翻译"
-    }
-}"""
+    "vocabulary": [
+        {"word": "今日", "reading": "きょう", "meaning": "今天", "part_of_speech": "名詞"},
+        {"word": "天気", "reading": "てんき", "meaning": "天气", "part_of_speech": "名詞"}
+    ],
+    "grammar_analysis": [
+        {"word": "は", "reading": "", "part_of_speech": "助詞", "explanation": "主题助词，提示句子主题"},
+        {"word": "です", "reading": "", "part_of_speech": "助動詞", "explanation": "礼貌体断定助动词，用于句末表示礼貌陈述"},
+        {"word": "ね", "reading": "", "part_of_speech": "終助詞", "explanation": "终助词，表示确认或征求对方同意"}
+    ],
+    "example_sentences": [
+        {"japanese": "今日は暑いですね。", "furigana": "きょうはあついですね。", "chinese": "今天真热啊。"},
+        {"japanese": "明日も良い天気でしょう。", "furigana": "あしたもよいてんきでしょう。", "chinese": "明天也会是好天气吧。"}
+    ]
+}
+
+规则：
+- furigana_tokens：原文每个词/字符一个token，纯假名和标点的reading留空字符串
+- vocabulary：仅列出实词（名词、动词、形容词、副词），2-6个
+- grammar_analysis：列出助词、助动词、重要语法结构，2-5个
+- example_sentences：提供2个例句，包含原文中的核心词汇或语法
+- 所有字段必须存在，不可省略"""
 
 # 模拟数据（用于测试模式）
 MOCK_RESPONSE = {
     "original_text": "こんにちは、今日は良い天気ですね。",
     "translation": "你好，今天天气真好啊。",
-    "furigana": "こんにちは、きょうはよいてんきですね。",
-    "grammar_analysis": [
-        {"word": "こんにちは", "explanation": "问候语，意为'你好'，用于白天见面时"},
-        {"word": "今日(きょう)", "explanation": "名词，意为'今天'"},
-        {"word": "良い(よい)", "explanation": "形容词，意为'好的'，修饰后面的名词"},
-        {"word": "天気(てんき)", "explanation": "名词，意为'天气'"},
-        {"word": "です", "explanation": "判断助动词，用于礼貌体陈述句结尾"},
-        {"word": "ね", "explanation": "终助词，表示确认、感叹或征求对方同意"},
+    "furigana_tokens": [
+        {"text": "こんにちは", "reading": ""},
+        {"text": "、", "reading": ""},
+        {"text": "今日", "reading": "きょう"},
+        {"text": "は", "reading": ""},
+        {"text": "良", "reading": "よ"},
+        {"text": "い", "reading": ""},
+        {"text": "天気", "reading": "てんき"},
+        {"text": "です", "reading": ""},
+        {"text": "ね", "reading": ""},
+        {"text": "。", "reading": ""},
     ],
-    "example_sentence": {"japanese": "こんにちは、お元気ですか。", "chinese": "你好，你还好吗？"},
+    "vocabulary": [
+        {"word": "今日", "reading": "きょう", "meaning": "今天", "part_of_speech": "名詞"},
+        {"word": "良い", "reading": "よい", "meaning": "好的", "part_of_speech": "形容詞"},
+        {"word": "天気", "reading": "てんき", "meaning": "天气", "part_of_speech": "名詞"},
+    ],
+    "grammar_analysis": [
+        {"word": "こんにちは", "reading": "", "part_of_speech": "感動詞", "explanation": "问候语，意为'你好'，用于白天见面时"},
+        {"word": "は", "reading": "", "part_of_speech": "助詞", "explanation": "主题助词，提示句子主题"},
+        {"word": "です", "reading": "", "part_of_speech": "助動詞", "explanation": "判断助动词，用于礼貌体陈述句结尾"},
+        {"word": "ね", "reading": "", "part_of_speech": "終助詞", "explanation": "终助词，表示确认、感叹或征求对方同意"},
+    ],
+    "example_sentences": [
+        {"japanese": "こんにちは、お元気ですか。", "furigana": "こんにちは、おげんきですか。", "chinese": "你好，你还好吗？"},
+        {"japanese": "今日は良い天気なので、散歩しましょう。", "furigana": "きょうはよいてんきなので、さんぽしましょう。", "chinese": "今天天气好，去散步吧。"},
+    ],
 }
 
 
@@ -69,14 +98,12 @@ class AIService:
 
     def analyze_image(self, image_base64: str) -> AnalyzeData:
         """分析图片中的日语文本"""
-        # 模拟模式：直接返回模拟数据
         if self.mock_mode:
             import time
 
-            time.sleep(0.5)  # 模拟网络延迟
+            time.sleep(0.5)
             return self._parse_response(MOCK_RESPONSE)
 
-        # 移除 base64 前缀（如果有）
         if image_base64.startswith("data:image"):
             image_base64 = image_base64.split(",")[1]
 
@@ -95,18 +122,16 @@ class AIService:
                         ],
                     },
                 ],
-                max_tokens=2000,
+                max_tokens=3000,
                 temperature=0.3,
             )
 
             content = response.choices[0].message.content.strip()
 
-            # 解析 JSON 响应
             try:
                 data = json.loads(content)
                 return self._parse_response(data)
             except json.JSONDecodeError as e:
-                # 尝试从 markdown 代码块中提取
                 import re
 
                 json_match = re.search(r"```(?:json)?\s*([\s\S]*?)```", content)
@@ -120,20 +145,41 @@ class AIService:
 
     def _parse_response(self, data: dict) -> AnalyzeData:
         """解析响应数据"""
-        grammar_analysis = [
-            GrammarPoint(word=item["word"], explanation=item["explanation"])
-            for item in data.get("grammar_analysis", [])
+        furigana_tokens = [
+            FuriganaToken(text=t["text"], reading=t.get("reading", ""))
+            for t in data.get("furigana_tokens", [])
         ]
-
-        example = data.get("example_sentence", {})
-        example_sentence = ExampleSentence(
-            japanese=example.get("japanese", ""), chinese=example.get("chinese", "")
-        )
-
+        vocabulary = [
+            VocabItem(
+                word=v["word"],
+                reading=v.get("reading", ""),
+                meaning=v["meaning"],
+                part_of_speech=v.get("part_of_speech", ""),
+            )
+            for v in data.get("vocabulary", [])
+        ]
+        grammar_analysis = [
+            GrammarPoint(
+                word=g["word"],
+                reading=g.get("reading", ""),
+                part_of_speech=g.get("part_of_speech", ""),
+                explanation=g["explanation"],
+            )
+            for g in data.get("grammar_analysis", [])
+        ]
+        example_sentences = [
+            ExampleSentence(
+                japanese=e["japanese"],
+                furigana=e.get("furigana", ""),
+                chinese=e["chinese"],
+            )
+            for e in data.get("example_sentences", [])
+        ]
         return AnalyzeData(
             original_text=data.get("original_text", ""),
             translation=data.get("translation", ""),
-            furigana=data.get("furigana", ""),
+            furigana_tokens=furigana_tokens,
+            vocabulary=vocabulary,
             grammar_analysis=grammar_analysis,
-            example_sentence=example_sentence,
+            example_sentences=example_sentences,
         )
